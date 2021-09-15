@@ -1,13 +1,28 @@
 const { Client, Intents } = require("discord.js");
 const { prefix, token } = require("./config.json");
 const ytdl = require("ytdl-core");
+const {
+	joinVoiceChannel,
+	createAudioPlayer,
+	createAudioResource,
+	entersState,
+	StreamType,
+	AudioPlayerStatus,
+	VoiceConnectionStatus,
+} = require('@discordjs/voice');
+const { createDiscordJSAdapter } = require('./adapter');
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
 
 const queue = new Map();
 
-client.once("ready", () => {
-  console.log("Ready!");
+const player = createAudioPlayer();
+1
+client.once("ready", async () => {
+    // Question: Play song first and then we subscribe to it when we join the channel ? 
+    // Does it not start once we add it ? 
+    await playSong();
+    console.log("Ready!");
 });
 
 client.once("reconnecting", () => {
@@ -22,7 +37,7 @@ client.on("interactionCreate", () => {
     console.log('test');
 })
 
-client.on("messageCreate", message => {
+client.on("messageCreate", async (message) => {
   console.log('Message');
   if (message.author.bot) return;
   if (!message.content.startsWith(prefix)) return;
@@ -30,8 +45,11 @@ client.on("messageCreate", message => {
   const serverQueue = queue.get(message.guild.id);
 
   if (message.content.startsWith(`${prefix}play`)) {
-    execute(message, serverQueue);
-    return;
+    const connection = await connectToChannel(message.member.voice.channel);
+    connection.subscribe(player);
+    message.reply('Test reply UI');
+    // execute(message, serverQueue);
+    // return;
   } else if (message.content.startsWith(`${prefix}skip`)) {
     skip(message, serverQueue);
     return;
@@ -78,12 +96,10 @@ async function execute(message, serverQueue) {
 
     queue.set(message.guild.id, queueContruct);
 
-    queueContruct.songs.push(song);
-
     try {
-      var connection = await voiceChannel.join();
+      var connection = await connectToChannel(channel);
       queueContruct.connection = connection;
-      play(message.guild, queueContruct.songs[0]);
+      playSong(message.guild, queueContruct.songs[0]);
     } catch (err) {
       console.log(err);
       queue.delete(message.guild.id);
@@ -94,6 +110,40 @@ async function execute(message, serverQueue) {
     return message.channel.send(`${song.title} has been added to the queue!`);
   }
 }
+
+// ========================== TODO: Refactor discordjs/voice and remove ytdl
+
+async function connectToChannel(channel) {
+	const connection = joinVoiceChannel({
+		channelId: channel.id,
+		guildId: channel.guild.id,
+		adapterCreator: createDiscordJSAdapter(channel),
+	});
+
+	try {
+		await entersState(connection, VoiceConnectionStatus.Ready, 30e3);
+		return connection;
+	} catch (error) {
+		connection.destroy();
+		throw error;
+	}
+}
+
+
+function playSong() {
+	const resource = createAudioResource('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', {
+		inputType: StreamType.Arbitrary,
+	});
+
+	player.play(resource);
+
+	return entersState(player, AudioPlayerStatus.Playing, 5e3);
+}
+
+
+
+
+// ==========================
 
 function skip(message, serverQueue) {
   if (!message.member.voice.channel)
@@ -118,23 +168,23 @@ function stop(message, serverQueue) {
   serverQueue.connection.dispatcher.end();
 }
 
-function play(guild, song) {
-  const serverQueue = queue.get(guild.id);
-  if (!song) {
-    serverQueue.voiceChannel.leave();
-    queue.delete(guild.id);
-    return;
-  }
+// function play(guild, song) {
+//   const serverQueue = queue.get(guild.id);
+//   if (!song) {
+//     serverQueue.voiceChannel.leave();
+//     queue.delete(guild.id);
+//     return;
+//   }
 
-  const dispatcher = serverQueue.connection
-    .play(ytdl(song.url))
-    .on("finish", () => {
-      serverQueue.songs.shift();
-      play(guild, serverQueue.songs[0]);
-    })
-    .on("error", error => console.error(error));
-  dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
-  serverQueue.textChannel.send(`Start playing: **${song.title}**`);
-}
+//   const dispatcher = serverQueue.connection
+//     .play(ytdl(song.url))
+//     .on("finish", () => {
+//       serverQueue.songs.shift();
+//       play(guild, serverQueue.songs[0]);
+//     })
+//     .on("error", error => console.error(error));
+//   dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
+//   serverQueue.textChannel.send(`Start playing: **${song.title}**`);
+// }
 
 client.login(token);
