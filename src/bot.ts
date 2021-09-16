@@ -8,9 +8,8 @@ import {
 } from '@discordjs/voice';
 import { Track } from './music/track';
 import { MusicSubscription } from './music/subscription';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
-const { token } = require('../config.json');
+import dotenv from 'dotenv';
+dotenv.config();
 
 const client = new Client({ intents: ['GUILD_VOICE_STATES', 'GUILD_MESSAGES', 'GUILDS'] });
 
@@ -127,7 +126,12 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 			await interaction.followUp(`Enqueued **${track.title}**`);
 		} catch (error) {
 			console.warn(error);
-			await interaction.reply('Failed to play track, please try again later!');
+			try {
+				await interaction.reply('Failed to play track, please try again later!');
+			} catch {
+				console.log('Failed');
+			}
+			
 		}
 	} else if (interaction.commandName === 'skip') {
 		if (subscription) {
@@ -185,4 +189,4 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 
 client.on('error', console.warn);
 
-void client.login(token);
+void client.login(process.env.TOKEN);

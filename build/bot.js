@@ -35,13 +35,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 exports.__esModule = true;
 var discord_js_1 = require("discord.js");
 var voice_1 = require("@discordjs/voice");
 var track_1 = require("./music/track");
 var subscription_1 = require("./music/subscription");
-// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
-var token = require('../config.json').token;
+var dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1["default"].config();
 var client = new discord_js_1.Client({ intents: ['GUILD_VOICE_STATES', 'GUILD_MESSAGES', 'GUILDS'] });
 client.on('ready', function () { return console.log('Ready!'); });
 // This contains the setup code for creating slash commands in a guild. The owner of the bot can send "!deploy" to create them.
@@ -109,17 +112,17 @@ client.on('messageCreate', function (message) { return __awaiter(void 0, void 0,
 var subscriptions = new Map();
 // Handles slash command interactions
 client.on('interactionCreate', function (interaction) { return __awaiter(void 0, void 0, void 0, function () {
-    var subscription, url, channel, error_1, track, error_2, current, queue;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+    var subscription, url, channel, error_1, track, error_2, _a, current, queue;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0:
                 if (!interaction.isCommand() || !interaction.guildId)
                     return [2 /*return*/];
                 subscription = subscriptions.get(interaction.guildId);
-                if (!(interaction.commandName === 'play')) return [3 /*break*/, 13];
+                if (!(interaction.commandName === 'play')) return [3 /*break*/, 16];
                 return [4 /*yield*/, interaction.deferReply()];
             case 1:
-                _a.sent();
+                _b.sent();
                 url = interaction.options.get('song').value;
                 // If a connection to the guild doesn't already exist and the user is in a voice channel, join that channel
                 // and create a subscription.
@@ -138,23 +141,23 @@ client.on('interactionCreate', function (interaction) { return __awaiter(void 0,
                 if (!!subscription) return [3 /*break*/, 3];
                 return [4 /*yield*/, interaction.followUp('Join a voice channel and then try that again!')];
             case 2:
-                _a.sent();
+                _b.sent();
                 return [2 /*return*/];
             case 3:
-                _a.trys.push([3, 5, , 7]);
+                _b.trys.push([3, 5, , 7]);
                 return [4 /*yield*/, voice_1.entersState(subscription.voiceConnection, voice_1.VoiceConnectionStatus.Ready, 20e3)];
             case 4:
-                _a.sent();
+                _b.sent();
                 return [3 /*break*/, 7];
             case 5:
-                error_1 = _a.sent();
+                error_1 = _b.sent();
                 console.warn(error_1);
                 return [4 /*yield*/, interaction.followUp('Failed to join voice channel within 20 seconds, please try again later!')];
             case 6:
-                _a.sent();
+                _b.sent();
                 return [2 /*return*/];
             case 7:
-                _a.trys.push([7, 10, , 12]);
+                _b.trys.push([7, 10, , 15]);
                 return [4 /*yield*/, track_1.Track.from(url, {
                         onStart: function () {
                             interaction.followUp({ content: 'Now playing!', ephemeral: true })["catch"](console.warn);
@@ -168,40 +171,48 @@ client.on('interactionCreate', function (interaction) { return __awaiter(void 0,
                         }
                     })];
             case 8:
-                track = _a.sent();
+                track = _b.sent();
                 // Enqueue the track and reply a success message to the user
                 subscription.enqueue(track);
                 return [4 /*yield*/, interaction.followUp("Enqueued **" + track.title + "**")];
             case 9:
-                _a.sent();
-                return [3 /*break*/, 12];
+                _b.sent();
+                return [3 /*break*/, 15];
             case 10:
-                error_2 = _a.sent();
+                error_2 = _b.sent();
                 console.warn(error_2);
-                return [4 /*yield*/, interaction.reply('Failed to play track, please try again later!')];
+                _b.label = 11;
             case 11:
-                _a.sent();
-                return [3 /*break*/, 12];
-            case 12: return [3 /*break*/, 40];
+                _b.trys.push([11, 13, , 14]);
+                return [4 /*yield*/, interaction.reply('Failed to play track, please try again later!')];
+            case 12:
+                _b.sent();
+                return [3 /*break*/, 14];
             case 13:
-                if (!(interaction.commandName === 'skip')) return [3 /*break*/, 18];
-                if (!subscription) return [3 /*break*/, 15];
+                _a = _b.sent();
+                console.log('Failed');
+                return [3 /*break*/, 14];
+            case 14: return [3 /*break*/, 15];
+            case 15: return [3 /*break*/, 43];
+            case 16:
+                if (!(interaction.commandName === 'skip')) return [3 /*break*/, 21];
+                if (!subscription) return [3 /*break*/, 18];
                 // Calling .stop() on an AudioPlayer causes it to transition into the Idle state. Because of a state transition
                 // listener defined in music/subscription.ts, transitions into the Idle state mean the next track from the queue
                 // will be loaded and played.
                 subscription.audioPlayer.stop();
                 return [4 /*yield*/, interaction.reply('Skipped song!')];
-            case 14:
-                _a.sent();
-                return [3 /*break*/, 17];
-            case 15: return [4 /*yield*/, interaction.reply('Not playing in this server!')];
-            case 16:
-                _a.sent();
-                _a.label = 17;
-            case 17: return [3 /*break*/, 40];
-            case 18:
-                if (!(interaction.commandName === 'queue')) return [3 /*break*/, 23];
-                if (!subscription) return [3 /*break*/, 20];
+            case 17:
+                _b.sent();
+                return [3 /*break*/, 20];
+            case 18: return [4 /*yield*/, interaction.reply('Not playing in this server!')];
+            case 19:
+                _b.sent();
+                _b.label = 20;
+            case 20: return [3 /*break*/, 43];
+            case 21:
+                if (!(interaction.commandName === 'queue')) return [3 /*break*/, 26];
+                if (!subscription) return [3 /*break*/, 23];
                 current = subscription.audioPlayer.state.status === voice_1.AudioPlayerStatus.Idle
                     ? "Nothing is currently playing!"
                     : "Playing **" + subscription.audioPlayer.state.resource.metadata.title + "**";
@@ -210,61 +221,61 @@ client.on('interactionCreate', function (interaction) { return __awaiter(void 0,
                     .map(function (track, index) { return index + 1 + ") " + track.title; })
                     .join('\n');
                 return [4 /*yield*/, interaction.reply(current + "\n\n" + queue)];
-            case 19:
-                _a.sent();
-                return [3 /*break*/, 22];
-            case 20: return [4 /*yield*/, interaction.reply('Not playing in this server!')];
-            case 21:
-                _a.sent();
-                _a.label = 22;
-            case 22: return [3 /*break*/, 40];
-            case 23:
-                if (!(interaction.commandName === 'pause')) return [3 /*break*/, 28];
-                if (!subscription) return [3 /*break*/, 25];
+            case 22:
+                _b.sent();
+                return [3 /*break*/, 25];
+            case 23: return [4 /*yield*/, interaction.reply('Not playing in this server!')];
+            case 24:
+                _b.sent();
+                _b.label = 25;
+            case 25: return [3 /*break*/, 43];
+            case 26:
+                if (!(interaction.commandName === 'pause')) return [3 /*break*/, 31];
+                if (!subscription) return [3 /*break*/, 28];
                 subscription.audioPlayer.pause();
                 return [4 /*yield*/, interaction.reply({ content: "Paused!", ephemeral: true })];
-            case 24:
-                _a.sent();
-                return [3 /*break*/, 27];
-            case 25: return [4 /*yield*/, interaction.reply('Not playing in this server!')];
-            case 26:
-                _a.sent();
-                _a.label = 27;
-            case 27: return [3 /*break*/, 40];
-            case 28:
-                if (!(interaction.commandName === 'resume')) return [3 /*break*/, 33];
-                if (!subscription) return [3 /*break*/, 30];
+            case 27:
+                _b.sent();
+                return [3 /*break*/, 30];
+            case 28: return [4 /*yield*/, interaction.reply('Not playing in this server!')];
+            case 29:
+                _b.sent();
+                _b.label = 30;
+            case 30: return [3 /*break*/, 43];
+            case 31:
+                if (!(interaction.commandName === 'resume')) return [3 /*break*/, 36];
+                if (!subscription) return [3 /*break*/, 33];
                 subscription.audioPlayer.unpause();
                 return [4 /*yield*/, interaction.reply({ content: "Unpaused!", ephemeral: true })];
-            case 29:
-                _a.sent();
-                return [3 /*break*/, 32];
-            case 30: return [4 /*yield*/, interaction.reply('Not playing in this server!')];
-            case 31:
-                _a.sent();
-                _a.label = 32;
-            case 32: return [3 /*break*/, 40];
-            case 33:
-                if (!(interaction.commandName === 'leave')) return [3 /*break*/, 38];
-                if (!subscription) return [3 /*break*/, 35];
+            case 32:
+                _b.sent();
+                return [3 /*break*/, 35];
+            case 33: return [4 /*yield*/, interaction.reply('Not playing in this server!')];
+            case 34:
+                _b.sent();
+                _b.label = 35;
+            case 35: return [3 /*break*/, 43];
+            case 36:
+                if (!(interaction.commandName === 'leave')) return [3 /*break*/, 41];
+                if (!subscription) return [3 /*break*/, 38];
                 subscription.voiceConnection.destroy();
                 subscriptions["delete"](interaction.guildId);
                 return [4 /*yield*/, interaction.reply({ content: "Left channel!", ephemeral: true })];
-            case 34:
-                _a.sent();
-                return [3 /*break*/, 37];
-            case 35: return [4 /*yield*/, interaction.reply('Not playing in this server!')];
-            case 36:
-                _a.sent();
-                _a.label = 37;
-            case 37: return [3 /*break*/, 40];
-            case 38: return [4 /*yield*/, interaction.reply('Unknown command')];
+            case 37:
+                _b.sent();
+                return [3 /*break*/, 40];
+            case 38: return [4 /*yield*/, interaction.reply('Not playing in this server!')];
             case 39:
-                _a.sent();
-                _a.label = 40;
-            case 40: return [2 /*return*/];
+                _b.sent();
+                _b.label = 40;
+            case 40: return [3 /*break*/, 43];
+            case 41: return [4 /*yield*/, interaction.reply('Unknown command')];
+            case 42:
+                _b.sent();
+                _b.label = 43;
+            case 43: return [2 /*return*/];
         }
     });
 }); });
 client.on('error', console.warn);
-void client.login(token);
+void client.login(process.env.TOKEN);
