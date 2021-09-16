@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "dev": "npm run tsc && node -r tsconfig-paths/register build/bot",
-    "start": "node -r tsconfig-paths/register build/bot",
+    "dev": "npm run tsc && node build/bot",
+    "start": "node build/bot",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "prettier": "prettier --write **/*.{ts,js,json,yml,yaml}",
