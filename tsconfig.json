@@ -1,0 +1,17 @@
+  
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"outDir": "build",
+		"rootDir": "src",
+		"paths": {
+			"@discordjs/opus": ["./node_modules/@discordjs/opus"],
+			"sodium": ["./node_modules/sodium"],
+			"libsodium-wrappers": ["./node_modules/libsodium-wrappers"],
+			"tweetnacl": ["./node_modules/tweetnacl"]
+		},
+		"esModuleInterop": true,
+	},
+	"include": ["src/**/*.ts"],
+	"exclude": [""]
+}
