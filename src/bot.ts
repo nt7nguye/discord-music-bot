@@ -1,4 +1,4 @@
-import { Client, Interaction, GuildMember, Snowflake } from 'discord.js';
+import { Client, Interaction, GuildMember, Snowflake, Message } from 'discord.js';
 import {
 	AudioPlayerStatus,
 	AudioResource,
@@ -9,6 +9,7 @@ import {
 import { Track } from './music/track';
 import { MusicSubscription } from './music/subscription';
 import dotenv from 'dotenv';
+import search from 'youtube-search';
 dotenv.config();
 
 const client = new Client({ intents: ['GUILD_VOICE_STATES', 'GUILD_MESSAGES', 'GUILDS'] });
@@ -54,6 +55,10 @@ client.on('messageCreate', async (message) => {
 				name: 'leave',
 				description: 'Leave the voice channel',
 			},
+			{
+				name: 'hi',
+				description: 'Say hi',
+			}
 		]);
 
 		await message.reply('Deployed!');
@@ -69,11 +74,14 @@ const subscriptions = new Map<Snowflake, MusicSubscription>();
 client.on('interactionCreate', async (interaction: Interaction) => {
 	if (!interaction.isCommand() || !interaction.guildId) return;
 	let subscription = subscriptions.get(interaction.guildId);
+	interaction.isMessageComponent
 
 	if (interaction.commandName === 'play') {
 		await interaction.deferReply();
 		// Extract the video URL from the command
-		const url = interaction.options.get('song')!.value! as string;
+		const searchText = interaction.options.get('song')!.value! as string;
+		const searchResults = await search(searchText, { maxResults: 10, key: 'AIzaSyCCUVBtRyT4DrCYW7bVe7tK-AvA5LPpAE8', type: 'video'});
+		const url = searchResults.results[0].link;
 
 		// If a connection to the guild doesn't already exist and the user is in a voice channel, join that channel
 		// and create a subscription.
@@ -182,6 +190,12 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 		} else {
 			await interaction.reply('Not playing in this server!');
 		}
+	} else if (interaction.commandName === 'hi') {
+		const channel = client.channels.cache.get(interaction.channelId);
+		await interaction.reply('nah');
+		if (channel.isText()) {
+			await channel.send('!fuck off')
+		}
 	} else {
 		await interaction.reply('Unknown command');
 	}
@@ -189,4 +203,5 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 
 client.on('error', console.warn);
 
-void client.login(process.env.TOKEN);
+console.log(process.env.TOKEN);
+client.login(process.env.TOKEN);
