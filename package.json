@@ -6,11 +6,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "start": "npm run build && node -r tsconfig-paths/register build/bot",
+    "dev": "npm run tsc && node build/bot",
+    "start": "node build/bot",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "prettier": "prettier --write **/*.{ts,js,json,yml,yaml}",
-    "build:check": "tsc --noEmit --incremental false"
+    "build:check": "tsc --noEmit --incremental false",
+    "tsc": "tsc",
+    "postinstall": "tsc"
   },
   "author": "",
   "license": "ISC",
@@ -19,12 +22,17 @@
     "@discordjs/voice": "^0.6.0",
     "discord-api-types": "^0.19.0",
     "discord.js": "^13.0.0-dev.328501b.1626912223",
+    "dotenv": "^10.0.0",
     "libsodium-wrappers": "^0.7.9",
     "youtube-dl-exec": "^1.2.4",
+    "youtube-search": "^1.1.6",
     "ytdl-core": "^4.8.3"
   },
   "devDependencies": {
     "tsconfig-paths": "^3.9.0",
     "typescript": "~4.2.2"
+  },
+  "engines": {
+    "node": "16.9.1"
   }
 }
