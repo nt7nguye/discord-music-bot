@@ -4,6 +4,6 @@ Bot for playing music on discord RIP dyno groovy
 
 # Dev Setup
 
-Populate `config.json` with variables shown in `config.example.json`
+Populate `.env` with variables shown in `.env.example`
 
-To start the bot running locally, `node index.js`
+To build TypeScript and start the bot, run `npm run dev`
