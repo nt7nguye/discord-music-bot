@@ -122,7 +122,9 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 					interaction.followUp({ content: 'Now playing!', ephemeral: true }).catch(console.warn);
 				},
 				onFinish() {
-					interaction.followUp({ content: 'Now finished!', ephemeral: true }).catch(console.warn);
+					if (subscription.queue.length == 0) {
+						interaction.followUp({ content: 'Now finished!', ephemeral: true }).catch(console.warn);
+					}
 				},
 				onError(error) {
 					console.warn(error);

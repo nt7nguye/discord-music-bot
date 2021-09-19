@@ -173,7 +173,9 @@ client.on('interactionCreate', function (interaction) { return __awaiter(void 0,
                             interaction.followUp({ content: 'Now playing!', ephemeral: true })["catch"](console.warn);
                         },
                         onFinish: function () {
-                            interaction.followUp({ content: 'Now finished!', ephemeral: true })["catch"](console.warn);
+                            if (subscription.queue.length == 0) {
+                                interaction.followUp({ content: 'Now finished!', ephemeral: true })["catch"](console.warn);
+                            }
                         },
                         onError: function (error) {
                             console.warn(error);
