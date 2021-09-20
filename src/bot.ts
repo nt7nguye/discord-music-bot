@@ -80,7 +80,7 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 		await interaction.deferReply();
 		// Extract the video URL from the command
 		const searchText = interaction.options.get('song')!.value! as string;
-		const searchResults = await search(searchText, { maxResults: 10, key: 'AIzaSyCCUVBtRyT4DrCYW7bVe7tK-AvA5LPpAE8', type: 'video'});
+		const searchResults = await search(searchText, { maxResults: 10, key: process.env.GOOGLE_API_KEY, type: 'video'});
 		const url = searchResults.results[0].link;
 
 		// If a connection to the guild doesn't already exist and the user is in a voice channel, join that channel
@@ -195,9 +195,6 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 	} else if (interaction.commandName === 'hi') {
 		const channel = client.channels.cache.get(interaction.channelId);
 		await interaction.reply('nah');
-		if (channel.isText()) {
-			await channel.send('!fuck off')
-		}
 	} else {
 		await interaction.reply('Unknown command');
 	}
@@ -205,5 +202,4 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 
 client.on('error', console.warn);
 
-console.log(process.env.TOKEN);
 client.login(process.env.TOKEN);
