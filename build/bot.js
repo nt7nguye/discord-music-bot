@@ -130,7 +130,7 @@ client.on('interactionCreate', function (interaction) { return __awaiter(void 0,
             case 1:
                 _b.sent();
                 searchText = interaction.options.get('song').value;
-                return [4 /*yield*/, youtube_search_1["default"](searchText, { maxResults: 10, key: 'AIzaSyCCUVBtRyT4DrCYW7bVe7tK-AvA5LPpAE8', type: 'video' })];
+                return [4 /*yield*/, youtube_search_1["default"](searchText, { maxResults: 10, key: process.env.GOOGLE_API_KEY, type: 'video' })];
             case 2:
                 searchResults = _b.sent();
                 url = searchResults.results[0].link;
@@ -205,7 +205,7 @@ client.on('interactionCreate', function (interaction) { return __awaiter(void 0,
                 console.log('Failed');
                 return [3 /*break*/, 15];
             case 15: return [3 /*break*/, 16];
-            case 16: return [3 /*break*/, 48];
+            case 16: return [3 /*break*/, 46];
             case 17:
                 if (!(interaction.commandName === 'skip')) return [3 /*break*/, 22];
                 if (!subscription) return [3 /*break*/, 19];
@@ -221,7 +221,7 @@ client.on('interactionCreate', function (interaction) { return __awaiter(void 0,
             case 20:
                 _b.sent();
                 _b.label = 21;
-            case 21: return [3 /*break*/, 48];
+            case 21: return [3 /*break*/, 46];
             case 22:
                 if (!(interaction.commandName === 'queue')) return [3 /*break*/, 27];
                 if (!subscription) return [3 /*break*/, 24];
@@ -240,7 +240,7 @@ client.on('interactionCreate', function (interaction) { return __awaiter(void 0,
             case 25:
                 _b.sent();
                 _b.label = 26;
-            case 26: return [3 /*break*/, 48];
+            case 26: return [3 /*break*/, 46];
             case 27:
                 if (!(interaction.commandName === 'pause')) return [3 /*break*/, 32];
                 if (!subscription) return [3 /*break*/, 29];
@@ -253,7 +253,7 @@ client.on('interactionCreate', function (interaction) { return __awaiter(void 0,
             case 30:
                 _b.sent();
                 _b.label = 31;
-            case 31: return [3 /*break*/, 48];
+            case 31: return [3 /*break*/, 46];
             case 32:
                 if (!(interaction.commandName === 'resume')) return [3 /*break*/, 37];
                 if (!subscription) return [3 /*break*/, 34];
@@ -266,7 +266,7 @@ client.on('interactionCreate', function (interaction) { return __awaiter(void 0,
             case 35:
                 _b.sent();
                 _b.label = 36;
-            case 36: return [3 /*break*/, 48];
+            case 36: return [3 /*break*/, 46];
             case 37:
                 if (!(interaction.commandName === 'leave')) return [3 /*break*/, 42];
                 if (!subscription) return [3 /*break*/, 39];
@@ -280,27 +280,21 @@ client.on('interactionCreate', function (interaction) { return __awaiter(void 0,
             case 40:
                 _b.sent();
                 _b.label = 41;
-            case 41: return [3 /*break*/, 48];
+            case 41: return [3 /*break*/, 46];
             case 42:
-                if (!(interaction.commandName === 'hi')) return [3 /*break*/, 46];
+                if (!(interaction.commandName === 'hi')) return [3 /*break*/, 44];
                 channel = client.channels.cache.get(interaction.channelId);
                 return [4 /*yield*/, interaction.reply('nah')];
             case 43:
                 _b.sent();
-                if (!channel.isText()) return [3 /*break*/, 45];
-                return [4 /*yield*/, channel.send('!fuck off')];
-            case 44:
+                return [3 /*break*/, 46];
+            case 44: return [4 /*yield*/, interaction.reply('Unknown command')];
+            case 45:
                 _b.sent();
-                _b.label = 45;
-            case 45: return [3 /*break*/, 48];
-            case 46: return [4 /*yield*/, interaction.reply('Unknown command')];
-            case 47:
-                _b.sent();
-                _b.label = 48;
-            case 48: return [2 /*return*/];
+                _b.label = 46;
+            case 46: return [2 /*return*/];
         }
     });
 }); });
 client.on('error', console.warn);
-console.log(process.env.TOKEN);
 client.login(process.env.TOKEN);
