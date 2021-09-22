@@ -4,7 +4,7 @@ Bot for playing music on discord RIP dyno groovy, using https://www.npmjs.com/pa
 
 # Dev setup and hosting
 
-1. Clone repo
+1. Clone repo and "npm install". Using node 16.9.1
 
 2. Populate `.env` with variables shown in `.env.example`, use your Discord Bot Token and Google API Key. 
 
