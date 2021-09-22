@@ -10,7 +10,7 @@
     "start": "node build/bot",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
-    "prettier": "prettier --write **/*.{ts,js,json,yml,yaml}",
+    "prettier": "prettier --write **/*.{ts,js,json}",
     "build:check": "tsc --noEmit --incremental false",
     "tsc": "tsc",
     "postinstall": "tsc"
@@ -23,11 +23,12 @@
     "discord-api-types": "^0.19.0",
     "discord.js": "^13.0.0-dev.328501b.1626912223",
     "dotenv": "^10.0.0",
+    "ffmpeg-static": "4.4.0",
     "libsodium-wrappers": "^0.7.9",
+    "prettier": "^2.4.1",
     "youtube-dl-exec": "^1.2.4",
     "youtube-search": "^1.1.6",
-    "ytdl-core": "^4.8.3",
-    "ffmpeg-static": "4.4.0"
+    "ytdl-core": "^4.8.3"
   },
   "devDependencies": {
     "tsconfig-paths": "^3.9.0",

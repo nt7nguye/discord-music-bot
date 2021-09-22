@@ -132,15 +132,109 @@ var __generator =
       return { value: op[0] ? op[1] : void 0, done: true };
     }
   };
+var __importDefault =
+  (this && this.__importDefault) ||
+  function (mod) {
+    return mod && mod.__esModule ? mod : { default: mod };
+  };
 exports.__esModule = true;
-exports.MusicSubscription = void 0;
+exports.MusicSubscription =
+  exports.createTrack =
+  exports.musicCommands =
+    void 0;
 var voice_1 = require("@discordjs/voice");
-var util_1 = require("util");
-var wait = util_1.promisify(setTimeout);
+var track_1 = require("./track");
+var utils_1 = require("../../utils");
+var youtube_search_1 = __importDefault(require("youtube-search"));
 /**
  * A MusicSubscription exists for each active VoiceConnection. Each subscription has its own audio player and queue,
  * and it also attaches logic to the audio player and voice connection for error handling and reconnection logic.
  */
+// TODO
+var musicCommands;
+(function (musicCommands) {})(
+  (musicCommands = exports.musicCommands || (exports.musicCommands = {}))
+);
+function createTrack(interaction) {
+  return __awaiter(this, void 0, void 0, function () {
+    var searchText, searchResults, url, track, error_1, _a;
+    return __generator(this, function (_b) {
+      switch (_b.label) {
+        case 0:
+          searchText = interaction.options.get("song").value;
+          return [
+            4 /*yield*/,
+            youtube_search_1["default"](searchText, {
+              maxResults: 10,
+              key: process.env.GOOGLE_API_KEY,
+              type: "video",
+            }),
+          ];
+        case 1:
+          searchResults = _b.sent();
+          url = searchResults.results[0].link;
+          _b.label = 2;
+        case 2:
+          _b.trys.push([2, 5, , 10]);
+          return [
+            4 /*yield*/,
+            track_1.Track.from(url, {
+              onStart: function () {
+                interaction
+                  .followUp({ content: "Now playing!", ephemeral: true })
+                  ["catch"](console.warn);
+              },
+              onFinish: function () {},
+              onError: function (error) {
+                console.warn(error);
+                interaction
+                  .followUp({
+                    content: "Error: " + error.message,
+                    ephemeral: true,
+                  })
+                  ["catch"](console.warn);
+              },
+            }),
+          ];
+        case 3:
+          track = _b.sent();
+          // Enqueue the track and reply a success message to the user
+          return [
+            4 /*yield*/,
+            interaction.followUp("Enqueued **" + track.title + "**"),
+          ];
+        case 4:
+          // Enqueue the track and reply a success message to the user
+          _b.sent();
+          return [2 /*return*/, track];
+        case 5:
+          error_1 = _b.sent();
+          console.warn(error_1);
+          _b.label = 6;
+        case 6:
+          _b.trys.push([6, 8, , 9]);
+          return [
+            4 /*yield*/,
+            interaction.followUp(
+              "Failed to play track, please try again later!"
+            ),
+          ];
+        case 7:
+          _b.sent();
+          return [3 /*break*/, 9];
+        case 8:
+          _a = _b.sent();
+          console.log("Failed");
+          return [3 /*break*/, 9];
+        case 9:
+          return [3 /*break*/, 10];
+        case 10:
+          return [2 /*return*/];
+      }
+    });
+  });
+}
+exports.createTrack = createTrack;
 var MusicSubscription = /** @class */ (function () {
   function MusicSubscription(voiceConnection) {
     var _this = this;
@@ -197,7 +291,7 @@ var MusicSubscription = /** @class */ (function () {
                         */
               return [
                 4 /*yield*/,
-                wait((this.voiceConnection.rejoinAttempts + 1) * 5000),
+                utils_1.wait((this.voiceConnection.rejoinAttempts + 1) * 5000),
               ];
             case 6:
               /*
@@ -293,6 +387,26 @@ var MusicSubscription = /** @class */ (function () {
     voiceConnection.subscribe(this.audioPlayer);
   }
   /**
+   *
+   */
+  MusicSubscription.prototype.destroy = function (interaction) {
+    return __awaiter(this, void 0, void 0, function () {
+      return __generator(this, function (_a) {
+        switch (_a.label) {
+          case 0:
+            this.voiceConnection.destroy();
+            return [
+              4 /*yield*/,
+              interaction.reply({ content: "Left channel!", ephemeral: true }),
+            ];
+          case 1:
+            _a.sent();
+            return [2 /*return*/];
+        }
+      });
+    });
+  };
+  /**
    * Adds a new Track to the queue.
    *
    * @param track The track to add to the queue
@@ -314,7 +428,7 @@ var MusicSubscription = /** @class */ (function () {
    */
   MusicSubscription.prototype.processQueue = function () {
     return __awaiter(this, void 0, void 0, function () {
-      var nextTrack, resource, error_1;
+      var nextTrack, resource, error_2;
       return __generator(this, function (_a) {
         switch (_a.label) {
           case 0:
@@ -340,13 +454,114 @@ var MusicSubscription = /** @class */ (function () {
             this.queueLock = false;
             return [3 /*break*/, 4];
           case 3:
-            error_1 = _a.sent();
+            error_2 = _a.sent();
             // If an error occurred, try the next item of the queue instead
-            nextTrack.onError(error_1);
+            nextTrack.onError(error_2);
             this.queueLock = false;
             return [2 /*return*/, this.processQueue()];
           case 4:
             return [2 /*return*/];
+        }
+      });
+    });
+  };
+  MusicSubscription.prototype.resolveInteraction = function (interaction) {
+    return __awaiter(this, void 0, void 0, function () {
+      var error_3, track, current, queue;
+      return __generator(this, function (_a) {
+        switch (_a.label) {
+          case 0:
+            if (!(interaction.commandName === "play")) return [3 /*break*/, 8];
+            return [4 /*yield*/, interaction.deferReply()];
+          case 1:
+            _a.sent();
+            _a.label = 2;
+          case 2:
+            _a.trys.push([2, 4, , 6]);
+            return [
+              4 /*yield*/,
+              voice_1.entersState(
+                this.voiceConnection,
+                voice_1.VoiceConnectionStatus.Ready,
+                20e3
+              ),
+            ];
+          case 3:
+            _a.sent();
+            return [3 /*break*/, 6];
+          case 4:
+            error_3 = _a.sent();
+            console.warn(error_3);
+            return [
+              4 /*yield*/,
+              interaction.followUp(
+                "Failed to join voice channel within 20 seconds, please try again later!"
+              ),
+            ];
+          case 5:
+            _a.sent();
+            return [2 /*return*/];
+          case 6:
+            return [4 /*yield*/, createTrack(interaction)];
+          case 7:
+            track = _a.sent();
+            this.enqueue(track);
+            return [3 /*break*/, 17];
+          case 8:
+            if (!(interaction.commandName === "skip")) return [3 /*break*/, 10];
+            // Calling .stop() on an AudioPlayer causes it to transition into the Idle state. Because of a state transition
+            // listener defined in music/this.ts, transitions into the Idle state mean the next track from the queue
+            // will be loaded and played.
+            this.audioPlayer.stop();
+            return [4 /*yield*/, interaction.reply("Skipped song!")];
+          case 9:
+            _a.sent();
+            return [3 /*break*/, 17];
+          case 10:
+            if (!(interaction.commandName === "queue"))
+              return [3 /*break*/, 12];
+            current =
+              this.audioPlayer.state.status === voice_1.AudioPlayerStatus.Idle
+                ? "Nothing is currently playing!"
+                : "Playing **" +
+                  this.audioPlayer.state.resource.metadata.title +
+                  "**";
+            queue = this.queue
+              .slice(0, 5)
+              .map(function (track, index) {
+                return index + 1 + ") " + track.title;
+              })
+              .join("\n");
+            return [4 /*yield*/, interaction.reply(current + "\n\n" + queue)];
+          case 11:
+            _a.sent();
+            return [3 /*break*/, 17];
+          case 12:
+            if (!(interaction.commandName === "pause"))
+              return [3 /*break*/, 14];
+            this.audioPlayer.pause();
+            return [
+              4 /*yield*/,
+              interaction.reply({ content: "Paused!", ephemeral: true }),
+            ];
+          case 13:
+            _a.sent();
+            return [3 /*break*/, 17];
+          case 14:
+            if (!(interaction.commandName === "resume"))
+              return [3 /*break*/, 16];
+            this.audioPlayer.unpause();
+            return [
+              4 /*yield*/,
+              interaction.reply({ content: "Unpaused!", ephemeral: true }),
+            ];
+          case 15:
+            _a.sent();
+            return [3 /*break*/, 17];
+          case 16:
+            return [2 /*return*/, false];
+          case 17:
+            return [2 /*return*/, true];
         }
       });
     });
