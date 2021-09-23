@@ -138,6 +138,8 @@ var voice_1 = require("@discordjs/voice");
 var discord_js_1 = require("discord.js");
 var subscription_1 = require("./music/subscription");
 var voice_2 = require("@discordjs/voice");
+var game_1 = require("./game");
+var utils_1 = require("../utils");
 /**
  * A Channel exists for each channel/guild the bot can work for. It contains all other objects to be
  * used in the channel (music subscriptions, games, ...)
@@ -145,29 +147,61 @@ var voice_2 = require("@discordjs/voice");
 var Channel = /** @class */ (function () {
   function Channel(guildId) {
     this.guildId = guildId;
+    this.game = new game_1.Game();
   }
+  /**
+   * Propagates interaction in order. Returns true if its resolved and false otherwise
+   */
   Channel.prototype.resolveInteraction = function (interaction) {
     return __awaiter(this, void 0, void 0, function () {
-      var channel, error_1, track, error_2, _a;
+      var greetings, channel, error_1, track, error_2, _a;
       return __generator(this, function (_b) {
         switch (_b.label) {
           case 0:
-            if (!!this.musicSubscription) return [3 /*break*/, 18];
+            /**
+             * Handle hi
+             */
+            if (interaction.commandName === "hi") {
+              greetings = [
+                "greetings",
+                "howdy",
+                "welcome",
+                "bonjour",
+                "good day",
+                "hey",
+                "hi-ya",
+                "how goes it",
+                "howdy-do",
+                "shalom",
+                "sup",
+              ];
+              interaction.reply(
+                utils_1.choose(greetings) + " " + interaction.user.username
+              );
+              return [2 /*return*/, true];
+            }
+            return [4 /*yield*/, this.game.resolveInteraction(interaction)];
+          case 1:
+            /**
+             * Handle rock, paper, scissors
+             */
+            if (_b.sent()) return [2 /*return*/, true];
+            if (!!this.musicSubscription) return [3 /*break*/, 19];
             if (
               !["queue", "pause", "resume", "leave", "skip"].includes(
                 interaction.commandName
               )
             )
-              return [3 /*break*/, 2];
+              return [3 /*break*/, 3];
             return [
               4 /*yield*/,
               interaction.reply("Not playing in this server!"),
             ];
-          case 1:
+          case 2:
             _b.sent();
             return [2 /*return*/, true];
-          case 2:
-            if (!(interaction.commandName === "play")) return [3 /*break*/, 17];
+          case 3:
+            if (!(interaction.commandName === "play")) return [3 /*break*/, 18];
             // If a connection to the guild doesn't already exist and the user is in a voice channel, join that channel
             // and create a this.musicSubscription.
             interaction.deferReply();
@@ -185,18 +219,18 @@ var Channel = /** @class */ (function () {
               );
               this.musicSubscription.voiceConnection.on("error", console.warn);
             }
-            if (!!this.musicSubscription) return [3 /*break*/, 4];
+            if (!!this.musicSubscription) return [3 /*break*/, 5];
             return [
               4 /*yield*/,
               interaction.reply(
                 "Join a voice channel and then try that again!"
               ),
             ];
-          case 3:
+          case 4:
             _b.sent();
             return [2 /*return*/, true];
-          case 4:
-            _b.trys.push([4, 6, , 8]);
+          case 5:
+            _b.trys.push([5, 7, , 9]);
             return [
               4 /*yield*/,
               voice_2.entersState(
@@ -205,10 +239,10 @@ var Channel = /** @class */ (function () {
                 20e3
               ),
             ];
-          case 5:
-            _b.sent();
-            return [3 /*break*/, 8];
           case 6:
+            _b.sent();
+            return [3 /*break*/, 9];
+          case 7:
             error_1 = _b.sent();
             console.warn(error_1);
             return [
@@ -217,70 +251,67 @@ var Channel = /** @class */ (function () {
                 "Failed to join voice channel within 20 seconds, please try again later!"
               ),
             ];
-          case 7:
+          case 8:
             _b.sent();
             return [2 /*return*/];
-          case 8:
-            _b.trys.push([8, 12, , 17]);
-            return [4 /*yield*/, subscription_1.createTrack(interaction)];
           case 9:
+            _b.trys.push([9, 13, , 18]);
+            return [4 /*yield*/, subscription_1.createTrack(interaction)];
+          case 10:
             track = _b.sent();
             return [4 /*yield*/, this.musicSubscription.enqueue(track)];
-          case 10:
+          case 11:
             _b.sent();
             return [
               4 /*yield*/,
               interaction.followUp("Enqueued **" + track.title + "**"),
             ];
-          case 11:
+          case 12:
             _b.sent();
             return [2 /*return*/, true];
-          case 12:
+          case 13:
             error_2 = _b.sent();
             console.warn(error_2);
-            _b.label = 13;
-          case 13:
-            _b.trys.push([13, 15, , 16]);
+            _b.label = 14;
+          case 14:
+            _b.trys.push([14, 16, , 17]);
             return [
               4 /*yield*/,
               interaction.reply(
                 "Failed to play track, please try again later!"
               ),
             ];
-          case 14:
-            _b.sent();
-            return [3 /*break*/, 16];
           case 15:
+            _b.sent();
+            return [3 /*break*/, 17];
+          case 16:
             _a = _b.sent();
             console.log("Failed");
-            return [3 /*break*/, 16];
-          case 16:
             return [3 /*break*/, 17];
           case 17:
-            return [3 /*break*/, 22];
+            return [3 /*break*/, 18];
           case 18:
-            if (!(interaction.commandName === "leave"))
-              return [3 /*break*/, 20];
-            return [4 /*yield*/, this.musicSubscription.destroy(interaction)];
+            return [3 /*break*/, 23];
           case 19:
+            if (!(interaction.commandName === "leave"))
+              return [3 /*break*/, 21];
+            return [4 /*yield*/, this.musicSubscription.destroy(interaction)];
+          case 20:
             _b.sent();
             delete this.musicSubscription;
             return [2 /*return*/, true];
-          case 20:
+          case 21:
             return [
               4 /*yield*/,
               this.musicSubscription.resolveInteraction(interaction),
             ];
-          case 21:
+          case 22:
             if (_b.sent()) {
               return [2 /*return*/, true];
             }
-            _b.label = 22;
-          case 22:
-            /**
-             * Handle with rockPaperScissors
-             */
-            // await this.rockPaperScissors.resolveInteraction(interaction);
+            _b.label = 23;
+          case 23:
+            // await this.game.resolveInteraction(interaction);
             // await this.coinFlips.resolveInteraction(interaction);
             return [2 /*return*/, false];
         }

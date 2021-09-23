@@ -139,8 +139,8 @@ var __importDefault =
   };
 exports.__esModule = true;
 var discord_js_1 = require("discord.js");
-var channel_1 = require("./channel");
 var dotenv_1 = __importDefault(require("dotenv"));
+var channel_1 = require("./channel");
 dotenv_1["default"].config();
 var client = new discord_js_1.Client({
   intents: ["GUILD_VOICE_STATES", "GUILD_MESSAGES", "GUILDS"],
@@ -228,6 +228,34 @@ client.on("messageCreate", function (message) {
               {
                 name: "hi",
                 description: "Say hi",
+              },
+              {
+                name: "rock",
+                description: "Play rock paper scissors",
+              },
+              {
+                name: "paper",
+                description: "Play rock paper scissors",
+              },
+              {
+                name: "scissors",
+                description: "Play rock paper scissors",
+              },
+              {
+                name: "cheat",
+                description: "Toggle cheat mode",
+                options: [
+                  {
+                    name: "on",
+                    type: "BOOLEAN",
+                    description: "on or off",
+                    required: false,
+                  },
+                ],
+              },
+              {
+                name: "coin-flip",
+                description: "Flip a coin",
               },
             ]),
           ];

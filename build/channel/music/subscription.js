@@ -287,23 +287,23 @@ var MusicSubscription = /** @class */ (function () {
               if (!(this.voiceConnection.rejoinAttempts < 5))
                 return [3 /*break*/, 7];
               /*
-                            The disconnect in this case is recoverable, and we also have <5 repeated attempts so we will reconnect.
-                        */
+                                      The disconnect in this case is recoverable, and we also have <5 repeated attempts so we will reconnect.
+                                  */
               return [
                 4 /*yield*/,
                 utils_1.wait((this.voiceConnection.rejoinAttempts + 1) * 5000),
               ];
             case 6:
               /*
-                            The disconnect in this case is recoverable, and we also have <5 repeated attempts so we will reconnect.
-                        */
+                                      The disconnect in this case is recoverable, and we also have <5 repeated attempts so we will reconnect.
+                                  */
               _c.sent();
               this.voiceConnection.rejoin();
               return [3 /*break*/, 8];
             case 7:
               /*
-                            The disconnect in this case may be recoverable, but we have no more remaining attempts - destroy.
-                        */
+                                      The disconnect in this case may be recoverable, but we have no more remaining attempts - destroy.
+                                  */
               this.voiceConnection.destroy();
               _c.label = 8;
             case 8:
@@ -314,8 +314,8 @@ var MusicSubscription = /** @class */ (function () {
               )
                 return [3 /*break*/, 10];
               /*
-                            Once destroyed, stop the subscription
-                        */
+                                    Once destroyed, stop the subscription
+                                */
               this.stop();
               return [3 /*break*/, 15];
             case 10:
@@ -330,10 +330,10 @@ var MusicSubscription = /** @class */ (function () {
               )
                 return [3 /*break*/, 15];
               /*
-                            In the Signalling or Connecting states, we set a 20 second time limit for the connection to become ready
-                            before destroying the voice connection. This stops the voice connection permanently existing in one of these
-                            states.
-                        */
+                                    In the Signalling or Connecting states, we set a 20 second time limit for the connection to become ready
+                                    before destroying the voice connection. This stops the voice connection permanently existing in one of these
+                                    states.
+                                */
               this.readyLock = true;
               _c.label = 11;
             case 11:

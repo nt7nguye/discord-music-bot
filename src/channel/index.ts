@@ -2,6 +2,8 @@ import { joinVoiceChannel } from "@discordjs/voice";
 import { CommandInteraction, GuildMember } from "discord.js";
 import { createTrack, MusicSubscription } from "./music/subscription";
 import { entersState, VoiceConnectionStatus } from "@discordjs/voice";
+import { Game } from "./game";
+import { choose } from "../utils";
 
 /**
  * A Channel exists for each channel/guild the bot can work for. It contains all other objects to be
@@ -9,21 +11,47 @@ import { entersState, VoiceConnectionStatus } from "@discordjs/voice";
  */
 export class Channel {
   private musicSubscription: MusicSubscription;
-  // public readonly rockPaperScissors: RockPaperScissorGame;
+  public readonly game: Game;
   // public readonly coinFlips: CoinFlipGame;
 
   public guildId: string;
 
   public constructor(guildId: string) {
     this.guildId = guildId;
+    this.game = new Game();
   }
 
+  /**
+   * Propagates interaction in order. Returns true if its resolved and false otherwise
+   */
   public async resolveInteraction(
     interaction: CommandInteraction
   ): Promise<boolean> {
     /**
-     * Propagates interaction in order. Returns true if its resolved and false otherwise
+     * Handle hi
      */
+    if (interaction.commandName === "hi") {
+      const greetings = [
+        "greetings",
+        "howdy",
+        "welcome",
+        "bonjour",
+        "good day",
+        "hey",
+        "hi-ya",
+        "how goes it",
+        "howdy-do",
+        "shalom",
+        "sup",
+      ];
+      interaction.reply(`${choose(greetings)} ${interaction.user.username}`);
+      return true;
+    }
+
+    /**
+     * Handle rock, paper, scissors
+     */
+    if (await this.game.resolveInteraction(interaction)) return true;
 
     /**
      * Handle with music subscription
@@ -107,11 +135,7 @@ export class Channel {
       }
     }
 
-    /**
-     * Handle with rockPaperScissors
-     */
-
-    // await this.rockPaperScissors.resolveInteraction(interaction);
+    // await this.game.resolveInteraction(interaction);
     // await this.coinFlips.resolveInteraction(interaction);
     return false;
   }

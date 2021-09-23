@@ -1,22 +1,6 @@
-import {
-  Client,
-  Interaction,
-  GuildMember,
-  Snowflake,
-  Message,
-} from "discord.js";
-import {
-  AudioPlayerStatus,
-  AudioResource,
-  entersState,
-  joinVoiceChannel,
-  VoiceConnectionStatus,
-} from "@discordjs/voice";
-import { Track } from "./channel/music/track";
-import { MusicSubscription } from "./channel/music/subscription";
-import { Channel } from "./channel";
+import { Client, Interaction, Snowflake } from "discord.js";
 import dotenv from "dotenv";
-import search from "youtube-search";
+import { Channel } from "./channel";
 dotenv.config();
 
 const client = new Client({
@@ -76,6 +60,34 @@ client.on("messageCreate", async (message) => {
       {
         name: "hi",
         description: "Say hi",
+      },
+      {
+        name: "rock",
+        description: "Play rock paper scissors",
+      },
+      {
+        name: "paper",
+        description: "Play rock paper scissors",
+      },
+      {
+        name: "scissors",
+        description: "Play rock paper scissors",
+      },
+      {
+        name: "cheat",
+        description: "Toggle cheat mode",
+        options: [
+          {
+            name: "on",
+            type: "BOOLEAN" as const,
+            description: "on or off",
+            required: false,
+          },
+        ],
+      },
+      {
+        name: "coin-flip",
+        description: "Flip a coin",
       },
     ]);
 
